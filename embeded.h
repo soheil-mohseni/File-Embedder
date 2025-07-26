@@ -14,7 +14,7 @@ typedef unsigned char int8;
 typedef unsigned short int int16;
 typedef unsigned int int32;
 typedef unsigned long long int int64;
-typedef unsigned  _BitInt(128) int128;
+// typedef unsigned  _BitInt(128) int128;
 
 #define $1 (int8 *)
 #define $2 (int16)
@@ -24,5 +24,6 @@ typedef unsigned  _BitInt(128) int128;
 #define $c (char *)
 #define $i (int)
 
-
+int16 length(int8 *str);
+bool compare(int8 *xs, int8 *ys);
 int main(int,char**);
