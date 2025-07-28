@@ -24,6 +24,21 @@ typedef unsigned long long int int64;
 #define $c (char *)
 #define $i (int)
 
+
+enum e_language {
+    c = 0,
+    asmb = 1
+};
+
+typedef  enum e_language language ;
+
+
+
+int8 *convet(int8,language);
+void printbody(language);
+
+void printheader(int8*,language);
 int16 length(int8 *str);
 bool compare(int8 *xs, int8 *ys);
 int main(int,char**);
+void usage(int8 *arg);
