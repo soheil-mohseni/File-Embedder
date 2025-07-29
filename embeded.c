@@ -40,11 +40,11 @@ bool compare(int8 *xs, int8 *ys) {
 
 void printheader(int8 *identifier, language lang) {
   switch (lang) {
-  case c:
-    printf("C program identifier: %s\n", $1 identifier);
-    break;
   case asmb:
-    printf("Assembly program identifier: %s\n", $1 identifier);
+    printf("Assembly program identifier: %s\n\tdb", $1 identifier);
+    break;
+  case c:
+    printf("C program identifier: %s\n\t\"", $1 identifier);
     break;
   }
   fflush(stdout);
@@ -53,16 +53,19 @@ void printheader(int8 *identifier, language lang) {
 
 int8 *convert(int8 ch, language lang) {
   static int8 ret[8];
+
   zero(ret, $2 8);
   switch (lang) {
   case asmb:
     snprintf($c ret, 7, "0x%.02hhx", (char)ch);
     break;
+
   default:
   case c:
     snprintf($c ret, 7, "\\x%.02hhx", (char)ch);
     break;
   }
+
   return ret;
 }
 
@@ -76,42 +79,44 @@ void printbody(language lang) {
   n = $4 0;
 
   while ((ret = read(0, $c buf, 1)) == 1) {
-    if ((lang == asmb) && (n)) {
+    if ((lang == asmb) && (n))
       write(0, ",", 1);
-    }
     n++;
     ch = convert(*buf, lang);
-    switch (lang) {
-        case asmb:
-          if ((n > 1) && (n % 16 == 1)) {
-            write(1, ",", 1);
-          }
-          write(1, $1 ch, length(ch));
-      
-          if (!(n % 16)) {
-            write(1, "\n\t\"", 4);
-          }
-          break;
-        case c:
-            write(1, $c ch, length(ch));
-            if (!(n%16)) {
-                    write(1, "\"\n\t\"", 4);            
-            }
-            break;       
-    }
-       *buf = *(buf+1) = (int8)0;
-  }
-      switch(lang) {
-        case c:
-            write(1, "\";\n", 3);
-            break;
-        case asmb:
-        default:
-            write(1, "\n", 1);
-    }
-    return;
-}
 
+    switch (lang) {
+    case asmb:
+      if ((n > 1) && ((n - 1) % 16))
+        write(1, ",", 1);
+      write(1, $c ch, length(ch));
+
+      if (!(n % 16))
+        write(1, "\n\tdb ", 5);
+
+      break;
+
+    default:
+    case c:
+      write(1, $c ch, length(ch));
+      if (!(n % 16))
+        write(1, "\n\t\"", 4);
+
+      break;
+    }
+    *buf = *(buf + 1) = (int8)0;
+  }
+
+  switch (lang) {
+  case c:
+    write(1, "\n", 3);
+    break;
+  case asmb:
+  default:
+    write(1, "\n", 1);
+  }
+
+  return;
+}
 int main(int argc, char *argv[]) {
   int8 *identifier;
   language lang;
