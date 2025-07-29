@@ -34,7 +34,7 @@ typedef  enum e_language language ;
 
 
 
-int8 *convet(int8,language);
+int8 *convert(int8,language);
 void printbody(language);
 
 void printheader(int8*,language);
